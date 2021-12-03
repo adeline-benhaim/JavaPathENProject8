@@ -14,8 +14,11 @@ import java.util.UUID;
 @RestController
 public class GpsUtilController {
 
-    @Autowired
     private GpsUtilService gpsUtilService;
+
+    public GpsUtilController(GpsUtilService gpsUtilService) {
+        this.gpsUtilService = gpsUtilService;
+    }
 
     /**
      * Get the actual user location
