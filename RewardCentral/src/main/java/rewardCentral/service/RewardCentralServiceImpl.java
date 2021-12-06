@@ -1,6 +1,5 @@
 package rewardCentral.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rewardCentral.RewardCentral;
 
@@ -21,7 +20,7 @@ public class RewardCentralServiceImpl implements RewardCentralService {
      * @param userId the id of the user concerned
      * @return the number of points assigned to the user for this attraction
      */
-    @Autowired
+    @Override
     public int getRewardPoints(UUID attractionId, UUID userId) {
         return rewardCentral.getAttractionRewardPoints(attractionId, userId);
     }

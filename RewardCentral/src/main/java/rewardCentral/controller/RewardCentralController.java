@@ -1,5 +1,7 @@
 package rewardCentral.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +12,7 @@ import java.util.UUID;
 @RestController
 public class RewardCentralController {
 
+//    @Autowired
     private RewardCentralService rewardCentralService;
 
     public RewardCentralController(RewardCentralService rewardCentralService){
@@ -22,7 +25,7 @@ public class RewardCentralController {
      * @param userId the id of the user concerned
      * @return the number of points assigned to the user for this attraction
      */
-    @RequestMapping("/getRewards")
+    @GetMapping("/getRewards")
     public int getRewards(@RequestParam UUID attractionId, @RequestParam UUID userId) {
         return rewardCentralService.getRewardPoints (attractionId, userId);
     }
