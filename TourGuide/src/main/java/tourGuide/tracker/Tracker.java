@@ -9,18 +9,17 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import tourGuide.helper.InternalTestHelper;
-import tourGuide.service.TourGuideService;
-import tourGuide.user.User;
+import tourGuide.service.TourGuideServiceImpl;
+import tourGuide.model.user.User;
 
 public class Tracker extends Thread {
 	private Logger logger = LoggerFactory.getLogger(Tracker.class);
 	private static final long trackingPollingInterval = TimeUnit.MINUTES.toSeconds(5);
 	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-	private final TourGuideService tourGuideService;
+	private final TourGuideServiceImpl tourGuideService;
 	private boolean stop = false;
 
-	public Tracker(TourGuideService tourGuideService) {
+	public Tracker(TourGuideServiceImpl tourGuideService) {
 		this.tourGuideService = tourGuideService;
 		
 		executorService.submit(this);

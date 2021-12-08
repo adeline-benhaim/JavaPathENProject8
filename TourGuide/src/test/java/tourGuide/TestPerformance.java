@@ -10,15 +10,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 import tourGuide.beans.AttractionBean;
 import tourGuide.beans.VisitedLocationBean;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.model.user.User;
 import tourGuide.proxies.GpsUtilProxy;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
-import tourGuide.user.User;
+import tourGuide.service.TourGuideServiceImpl;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
@@ -52,21 +52,20 @@ public class TestPerformance {
     @Autowired
     RewardsService rewardsService;
     @Autowired
-    TourGuideService tourGuideService;
+    TourGuideServiceImpl tourGuideService;
 
     private static final Locale locale = new Locale("en", "US");
 
     @Before
     public void init() {
         Locale.setDefault(locale);
-        InternalTestHelper.setInternalUserNumber(100000);
+        InternalTestHelper.setInternalUserNumber(100);
     }
 
     @Test
     public void highVolumeTrackLocation() {
         // Users should be incremented up to 100,000, and test finishes within 15 minutes
-//        InternalTestHelper.setInternalUserNumber(1000);
-//        TourGuideService tourGuideService = new TourGuideService(gpsUtilProxy, rewardsService);
+        tourGuideService = new TourGuideServiceImpl(gpsUtilProxy, rewardsService);
 
         List<User> allUsers = tourGuideService.getAllUsers();
         StopWatch stopWatch = new StopWatch();
@@ -85,10 +84,9 @@ public class TestPerformance {
     @Test
     public void highVolumeGetRewards() {
         // Users should be incremented up to 100,000, and test finishes within 20 minutes
-//        InternalTestHelper.setInternalUserNumber(100);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-//        TourGuideService tourGuideService = new TourGuideService(gpsUtilProxy, rewardsService);
+        tourGuideService = new TourGuideServiceImpl(gpsUtilProxy, rewardsService);
         AttractionBean attraction = gpsUtilProxy.getAttractions().get(0);
         List<User> allUsers = tourGuideService.getAllUsers();
         allUsers.forEach(u -> {
