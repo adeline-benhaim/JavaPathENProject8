@@ -6,8 +6,8 @@ import tourGuide.beans.LocationBean;
 import tourGuide.beans.VisitedLocationBean;
 import tourGuide.proxies.GpsUtilProxy;
 import tourGuide.proxies.RewardCentralProxy;
-import tourGuide.user.User;
-import tourGuide.user.UserReward;
+import tourGuide.model.user.User;
+import tourGuide.model.user.UserReward;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -66,7 +66,7 @@ public class RewardsService {
         return !(getDistance(attraction, visitedLocation.locationBean) > proximityBuffer);
     }
 
-    private int getRewardPoints(AttractionBean attraction, User user) {
+    public int getRewardPoints(AttractionBean attraction, User user) {
         return rewardsCentral.getRewards(attraction.attractionId, user.getUserId());
     }
 

@@ -11,6 +11,9 @@
         <module name="TourGuide.TourGuide.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8" />
+    <bytecodeTargetLevel>
+      <module name="TourGuide.TourGuide.main~1" target="1.8" />
+      <module name="TourGuide.TourGuide.test~1" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

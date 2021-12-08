@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tourGuide.TestTourGuideService" tests="8" skipped="0" failures="0" errors="0" timestamp="2021-12-08T18:46:39" hostname="DESKTOP-TFVN31C" time="2.44">
+  <properties/>
+  <testcase name="addUser" classname="tourGuide.TestTourGuideService" time="0.007"/>
+  <testcase name="getTripDeals" classname="tourGuide.TestTourGuideService" time="0.043"/>
+  <testcase name="getAllUsers" classname="tourGuide.TestTourGuideService" time="0.008"/>
+  <testcase name="getUserLocationWithVisitedLocation" classname="tourGuide.TestTourGuideService" time="0.007"/>
+  <testcase name="getNearbyAttractionListByUserDto" classname="tourGuide.TestTourGuideService" time="2.116"/>
+  <testcase name="trackUser" classname="tourGuide.TestTourGuideService" time="0.079"/>
+  <testcase name="getNearbyAttractions" classname="tourGuide.TestTourGuideService" time="0.11"/>
+  <testcase name="getUserLocationWithoutVisitedLocation" classname="tourGuide.TestTourGuideService" time="0.063"/>
+  <system-out><![CDATA[2021-12-08 19:46:39.073  INFO 128104 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Neither @ContextConfiguration nor @ContextHierarchy found for test class [tourGuide.TestTourGuideService], using SpringBootContextLoader
+2021-12-08 19:46:39.074  INFO 128104 --- [    Test worker] o.s.t.c.support.AbstractContextLoader    : Could not detect default resource locations for test class [tourGuide.TestTourGuideService]: no resource found for suffixes {-context.xml, Context.groovy}.
+2021-12-08 19:46:39.074  INFO 128104 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [tourGuide.TestTourGuideService]: TestTourGuideService does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2021-12-08 19:46:39.082  INFO 128104 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration tourGuide.Application for test class tourGuide.TestTourGuideService
+2021-12-08 19:46:39.086  INFO 128104 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener, org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener, org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+2021-12-08 19:46:39.088  INFO 128104 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@3d2b3174, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@46228d2d, org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener@2096dd77, org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener@a2c83cf, org.springframework.test.context.support.DirtiesContextTestExecutionListener@6ee8b36f, org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener@3c71107a, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener@2a1a1fe6, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener@4446c391, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener@6f1e63bd, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener@5bd84ce4]
+2021-12-08 19:46:39.094  INFO 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : TestMode enabled
+2021-12-08 19:46:39.095 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Initializing users
+2021-12-08 19:46:39.095 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Created 0 internal test users.
+2021-12-08 19:46:39.095 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Finished initializing users
+2021-12-08 19:46:39.096 DEBUG 128104 --- [ol-904-thread-1] tourGuide.tracker.Tracker                : Begin Tracker. Tracking 0 users.
+2021-12-08 19:46:39.096 DEBUG 128104 --- [ol-904-thread-1] tourGuide.tracker.Tracker                : Tracker Time Elapsed: 0 seconds.
+2021-12-08 19:46:39.096 DEBUG 128104 --- [ol-904-thread-1] tourGuide.tracker.Tracker                : Tracker sleeping
+2021-12-08 19:46:39.103  INFO 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : TestMode enabled
+2021-12-08 19:46:39.103 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Initializing users
+2021-12-08 19:46:39.103 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Created 0 internal test users.
+2021-12-08 19:46:39.103 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Finished initializing users
+2021-12-08 19:46:39.104 DEBUG 128104 --- [ol-905-thread-1] tourGuide.tracker.Tracker                : Begin Tracker. Tracking 0 users.
+2021-12-08 19:46:39.106 DEBUG 128104 --- [ol-905-thread-1] tourGuide.tracker.Tracker                : Tracker Time Elapsed: 0 seconds.
+2021-12-08 19:46:39.107 DEBUG 128104 --- [ol-905-thread-1] tourGuide.tracker.Tracker                : Tracker sleeping
+2021-12-08 19:46:39.148  INFO 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : TestMode enabled
+2021-12-08 19:46:39.148 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Initializing users
+2021-12-08 19:46:39.148 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Created 0 internal test users.
+2021-12-08 19:46:39.148 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Finished initializing users
+2021-12-08 19:46:39.149 DEBUG 128104 --- [ol-906-thread-1] tourGuide.tracker.Tracker                : Begin Tracker. Tracking 0 users.
+2021-12-08 19:46:39.149 DEBUG 128104 --- [ol-906-thread-1] tourGuide.tracker.Tracker                : Tracker Time Elapsed: 0 seconds.
+2021-12-08 19:46:39.149 DEBUG 128104 --- [ol-906-thread-1] tourGuide.tracker.Tracker                : Tracker sleeping
+2021-12-08 19:46:39.156  INFO 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : TestMode enabled
+2021-12-08 19:46:39.157 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Initializing users
+2021-12-08 19:46:39.157 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Created 0 internal test users.
+2021-12-08 19:46:39.157 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Finished initializing users
+2021-12-08 19:46:39.157 DEBUG 128104 --- [ol-907-thread-1] tourGuide.tracker.Tracker                : Begin Tracker. Tracking 0 users.
+2021-12-08 19:46:39.158 DEBUG 128104 --- [ol-907-thread-1] tourGuide.tracker.Tracker                : Tracker Time Elapsed: 0 seconds.
+2021-12-08 19:46:39.158 DEBUG 128104 --- [ol-907-thread-1] tourGuide.tracker.Tracker                : Tracker sleeping
+2021-12-08 19:46:39.164  INFO 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : TestMode enabled
+2021-12-08 19:46:39.164 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Initializing users
+2021-12-08 19:46:39.164 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Created 0 internal test users.
+2021-12-08 19:46:39.164 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Finished initializing users
+2021-12-08 19:46:39.165 DEBUG 128104 --- [ol-908-thread-1] tourGuide.tracker.Tracker                : Begin Tracker. Tracking 1 users.
+2021-12-08 19:46:39.166 DEBUG 128104 --- [ol-908-thread-1] tourGuide.tracker.Tracker                : Tracker Time Elapsed: 0 seconds.
+2021-12-08 19:46:39.166 DEBUG 128104 --- [ol-908-thread-1] tourGuide.tracker.Tracker                : Tracker sleeping
+2021-12-08 19:46:41.281  INFO 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : TestMode enabled
+2021-12-08 19:46:41.281 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Initializing users
+2021-12-08 19:46:41.281 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Created 0 internal test users.
+2021-12-08 19:46:41.281 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Finished initializing users
+2021-12-08 19:46:41.282 DEBUG 128104 --- [ol-913-thread-1] tourGuide.tracker.Tracker                : Begin Tracker. Tracking 0 users.
+2021-12-08 19:46:41.282 DEBUG 128104 --- [ol-913-thread-1] tourGuide.tracker.Tracker                : Tracker Time Elapsed: 0 seconds.
+2021-12-08 19:46:41.282 DEBUG 128104 --- [ol-913-thread-1] tourGuide.tracker.Tracker                : Tracker sleeping
+2021-12-08 19:46:41.360  INFO 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : TestMode enabled
+2021-12-08 19:46:41.360 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Initializing users
+2021-12-08 19:46:41.360 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Created 0 internal test users.
+2021-12-08 19:46:41.360 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Finished initializing users
+2021-12-08 19:46:41.361 DEBUG 128104 --- [ol-916-thread-1] tourGuide.tracker.Tracker                : Begin Tracker. Tracking 0 users.
+2021-12-08 19:46:41.361 DEBUG 128104 --- [ol-916-thread-1] tourGuide.tracker.Tracker                : Tracker Time Elapsed: 0 seconds.
+2021-12-08 19:46:41.361 DEBUG 128104 --- [ol-916-thread-1] tourGuide.tracker.Tracker                : Tracker sleeping
+2021-12-08 19:46:41.471  INFO 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : TestMode enabled
+2021-12-08 19:46:41.472 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Initializing users
+2021-12-08 19:46:41.472 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Created 0 internal test users.
+2021-12-08 19:46:41.472 DEBUG 128104 --- [    Test worker] tourGuide.service.TourGuideServiceImpl   : Finished initializing users
+2021-12-08 19:46:41.472 DEBUG 128104 --- [ol-919-thread-1] tourGuide.tracker.Tracker                : Begin Tracker. Tracking 0 users.
+2021-12-08 19:46:41.473 DEBUG 128104 --- [ol-919-thread-1] tourGuide.tracker.Tracker                : Tracker Time Elapsed: 0 seconds.
+2021-12-08 19:46:41.473 DEBUG 128104 --- [ol-919-thread-1] tourGuide.tracker.Tracker                : Tracker sleeping
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

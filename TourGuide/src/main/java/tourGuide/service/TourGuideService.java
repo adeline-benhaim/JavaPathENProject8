@@ -1,154 +1,69 @@
 package tourGuide.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import tourGuide.beans.AttractionBean;
-import tourGuide.beans.LocationBean;
 import tourGuide.beans.VisitedLocationBean;
-import tourGuide.helper.InternalTestHelper;
-import tourGuide.proxies.GpsUtilProxy;
-import tourGuide.tracker.Tracker;
-import tourGuide.user.User;
-import tourGuide.user.UserReward;
+import tourGuide.model.Dto.NearbyAttractionListByUserDto;
+import tourGuide.model.user.User;
+import tourGuide.model.user.UserReward;
 import tripPricer.Provider;
-import tripPricer.TripPricer;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.IntStream;
 
-@Service
-public class TourGuideService {
-    private final Logger logger = LoggerFactory.getLogger(TourGuideService.class);
-    private final GpsUtilProxy gpsUtil;
-    private final RewardsService rewardsService;
-    private final TripPricer tripPricer = new TripPricer();
-    public final Tracker tracker;
-    boolean testMode = true;
+public interface TourGuideService {
 
-    public TourGuideService(GpsUtilProxy gpsUtil, RewardsService rewardsService) {
-        this.gpsUtil = gpsUtil;
-        this.rewardsService = rewardsService;
-
-        if (testMode) {
-            logger.info("TestMode enabled");
-            logger.debug("Initializing users");
-            initializeInternalUsers();
-            logger.debug("Finished initializing users");
-        }
-        tracker = new Tracker(this);
-        addShutDownHook();
-    }
-
-    public List<UserReward> getUserRewards(User user) {
-        return user.getUserRewards();
-    }
-
-    public VisitedLocationBean getUserLocation(User user) throws ExecutionException, InterruptedException {
-        return (user.getVisitedLocations().size() > 0) ?
-                user.getLastVisitedLocation() :
-                trackUserLocation(user).get();
-    }
-
-    public User getUser(String userName) {
-        return internalUserMap.get(userName);
-    }
-
-    public List<User> getAllUsers() {
-        return new ArrayList<>(internalUserMap.values());
-    }
-
-    public void addUser(User user) {
-        if (!internalUserMap.containsKey(user.getUserName())) {
-            internalUserMap.put(user.getUserName(), user);
-        }
-    }
-
-    public List<Provider> getTripDeals(User user) {
-        int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
-        List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
-                user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
-        user.setTripDeals(providers);
-        return providers;
-    }
-
-    public CompletableFuture<VisitedLocationBean> trackUserLocation(User user) {
-        ExecutorService executorService = Executors.newFixedThreadPool(1000);
-        return CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId()), executorService)
-                .thenApply(visitedLocationBean -> {
-                    user.addToVisitedLocations(visitedLocationBean);
-                    rewardsService.calculateRewards(user);
-                    return visitedLocationBean;
-                });
-
-//        CompletableFuture<VisitedLocationBean> visitedLocation = CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId()),executorService);
-//        CompletableFuture<Void> future = visitedLocation.thenAccept(user::addToVisitedLocations);
-//        rewardsService.calculateRewards(user);
-//        return visitedLocation;
-    }
-
-    public List<AttractionBean> getNearByAttractions(VisitedLocationBean visitedLocation) {
-        List<AttractionBean> nearbyAttractions = new ArrayList<>();
-        for (AttractionBean attraction : gpsUtil.getAttractions()) {
-            if (rewardsService.isWithinAttractionProximity(attraction, visitedLocation.locationBean)) {
-                nearbyAttractions.add(attraction);
-            }
-        }
-
-        return nearbyAttractions;
-    }
-
-    private void addShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(tracker::stopTracking));
-    }
-
-    /**********************************************************************************
+    /**
+     * Get a visitedLocation by user
      *
-     * Methods Below: For Internal Testing
+     * @param user the user whose location is sought
+     * @return actual user location if its list of visitedLocation is empty otherwise its last visitedLocation
+     * @throws ExecutionException can be thrown when attempting to retrieve the result of trackUserLocation that aborted by throwing an exception.
+     * @throws InterruptedException can be thrown when a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted, either before or during the activity.
+     */
+    VisitedLocationBean getUserLocation(User user) throws ExecutionException, InterruptedException;
+
+    /**
+     * Get a list of rewards per user.
+     * Each reward contain :
+     * - a visited location
+     * - an attraction
+     * - a reward point
      *
-     **********************************************************************************/
-    private static final String tripPricerApiKey = "test-server-api-key";
-    // Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
-    private final Map<String, User> internalUserMap = new HashMap<>();
+     * @param user the user whose rewards are sought
+     * @return a list of user reward
+     */
+    List<UserReward> getUserRewards(User user);
 
-    private void initializeInternalUsers() {
-        IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {
-            String userName = "internalUser" + i;
-            String phone = "000";
-            String email = userName + "@tourGuide.com";
-            User user = new User(UUID.randomUUID(), userName, phone, email);
-            generateUserLocationHistory(user);
+    /**
+     * Get a list of provider with price offer by user.
+     * Each provider contains :
+     * - a name
+     * - a price
+     * - an id
+     *
+     * @param user the user whose providers are sought
+     * @return a list of providers with price offer
+     */
+    List<Provider> getTripDeals(User user);
 
-            internalUserMap.put(userName, user);
-        });
-        logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
-    }
+    /**
+     * Get a user by userName
+     *
+     * @param userName of user sought
+     * @return the user found
+     */
+    User getUser(String userName);
 
-    private void generateUserLocationHistory(User user) {
-        IntStream.range(0, 3).forEach(i -> user.addToVisitedLocations(new VisitedLocationBean(user.getUserId(), new LocationBean(generateRandomLatitude(), generateRandomLongitude()), getRandomTime())));
-    }
 
-    private double generateRandomLongitude() {
-        double leftLimit = -180;
-        double rightLimit = 180;
-        return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
-    }
-
-    private double generateRandomLatitude() {
-        double leftLimit = -85.05112878;
-        double rightLimit = 85.05112878;
-        return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
-    }
-
-    private Date getRandomTime() {
-        LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
-        return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
-    }
-
+    /**
+     * Get the closest five tourist attractions to the user sorted in ascending order with user location information (longitude and latitude).
+     * Each tourist attraction contains :
+     * - a name
+     * - a location (longitude and latitude)
+     * - a distance in miles between the user's location
+     * - the reward points for visiting this attraction
+     *
+     * @param visitedLocationBean a user location
+     * @return the closest five tourist attractions to the user sorted in ascending order with all user and attractions information
+     */
+    NearbyAttractionListByUserDto nearbyAttractionListByUserDto(VisitedLocationBean visitedLocationBean);
 }
