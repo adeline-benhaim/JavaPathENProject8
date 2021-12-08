@@ -99,4 +99,8 @@ public class User {
 		return tripDeals;
 	}
 
+	public Object addToVisitedLocationsObjet(Object o) {
+		visitedLocations.add((VisitedLocationBean) o);
+		return o;
+	}
 }

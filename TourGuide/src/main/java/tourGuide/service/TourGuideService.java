@@ -2,14 +2,12 @@ package tourGuide.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tourGuide.beans.AttractionBean;
 import tourGuide.beans.LocationBean;
 import tourGuide.beans.VisitedLocationBean;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.proxies.GpsUtilProxy;
-import tourGuide.proxies.RewardCentralProxy;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
@@ -23,7 +21,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -38,14 +35,6 @@ public class TourGuideService {
     public TourGuideService(GpsUtilProxy gpsUtil, RewardsService rewardsService) {
         this.gpsUtil = gpsUtil;
         this.rewardsService = rewardsService;
-
-//    @Autowired
-//    GpsUtilProxy gpsUtil;
-//
-//    @Autowired
-//    RewardsService rewardsService;
-//
-//    public TourGuideService() {
 
         if (testMode) {
             logger.info("TestMode enabled");
@@ -92,15 +81,16 @@ public class TourGuideService {
     public CompletableFuture<VisitedLocationBean> trackUserLocation(User user) {
         ExecutorService executorService = Executors.newFixedThreadPool(1000);
         return CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId()), executorService)
-                .thenApply(visitedLocation -> {
-                    user.addToVisitedLocations(visitedLocation);
+                .thenApply(visitedLocationBean -> {
+                    user.addToVisitedLocations(visitedLocationBean);
                     rewardsService.calculateRewards(user);
-                    return visitedLocation;
+                    return visitedLocationBean;
                 });
-//		VisitedLocationBean visitedLocation = gpsUtil.getUserLocation(user.getUserId());
-//		user.addToVisitedLocations(visitedLocation);
-//		rewardsService.calculateRewards(user);
-//		return visitedLocation;
+
+//        CompletableFuture<VisitedLocationBean> visitedLocation = CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId()),executorService);
+//        CompletableFuture<Void> future = visitedLocation.thenAccept(user::addToVisitedLocations);
+//        rewardsService.calculateRewards(user);
+//        return visitedLocation;
     }
 
     public List<AttractionBean> getNearByAttractions(VisitedLocationBean visitedLocation) {
@@ -115,11 +105,7 @@ public class TourGuideService {
     }
 
     private void addShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                tracker.stopTracking();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(tracker::stopTracking));
     }
 
     /**********************************************************************************
@@ -145,9 +131,7 @@ public class TourGuideService {
     }
 
     private void generateUserLocationHistory(User user) {
-        IntStream.range(0, 3).forEach(i -> {
-            user.addToVisitedLocations(new VisitedLocationBean(user.getUserId(), new LocationBean(generateRandomLatitude(), generateRandomLongitude()), getRandomTime()));
-        });
+        IntStream.range(0, 3).forEach(i -> user.addToVisitedLocations(new VisitedLocationBean(user.getUserId(), new LocationBean(generateRandomLatitude(), generateRandomLongitude()), getRandomTime())));
     }
 
     private double generateRandomLongitude() {
