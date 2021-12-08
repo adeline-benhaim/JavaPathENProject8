@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import gpsUtil.location.VisitedLocation;
+import tourGuide.beans.VisitedLocationBean;
 import tripPricer.Provider;
 
 public class User {
@@ -14,7 +14,7 @@ public class User {
 	private String phoneNumber;
 	private String emailAddress;
 	private Date latestLocationTimestamp;
-	private List<VisitedLocation> visitedLocations = new ArrayList<>();
+	private List<VisitedLocationBean> visitedLocations = new ArrayList<>();
 	private List<UserReward> userRewards = new ArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
@@ -57,11 +57,11 @@ public class User {
 		return latestLocationTimestamp;
 	}
 	
-	public void addToVisitedLocations(VisitedLocation visitedLocation) {
+	public void addToVisitedLocations(VisitedLocationBean visitedLocation) {
 		visitedLocations.add(visitedLocation);
 	}
 	
-	public List<VisitedLocation> getVisitedLocations() {
+	public List<VisitedLocationBean> getVisitedLocations() {
 		return visitedLocations;
 	}
 	
@@ -87,7 +87,7 @@ public class User {
 		this.userPreferences = userPreferences;
 	}
 
-	public VisitedLocation getLastVisitedLocation() {
+	public VisitedLocationBean getLastVisitedLocation() {
 		return visitedLocations.get(visitedLocations.size() - 1);
 	}
 	
@@ -99,4 +99,8 @@ public class User {
 		return tripDeals;
 	}
 
+	public Object addToVisitedLocationsObjet(Object o) {
+		visitedLocations.add((VisitedLocationBean) o);
+		return o;
+	}
 }

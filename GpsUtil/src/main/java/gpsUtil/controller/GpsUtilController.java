@@ -4,6 +4,7 @@ import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import gpsUtil.service.GpsUtilService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,15 +15,18 @@ import java.util.UUID;
 @RestController
 public class GpsUtilController {
 
-    @Autowired
     private GpsUtilService gpsUtilService;
+
+    public GpsUtilController(GpsUtilService gpsUtilService) {
+        this.gpsUtilService = gpsUtilService;
+    }
 
     /**
      * Get the actual user location
      * @param userId id of the user whose location is sought
      * @return a visited location composed of a userId, a location with longitude and latitude and a date
      */
-    @RequestMapping("/location")
+    @GetMapping("/location")
     public VisitedLocation getUserLocation(@RequestParam UUID userId) {
         return gpsUtilService.getUserLocation(userId);
     }
@@ -31,7 +35,7 @@ public class GpsUtilController {
      * Get a list of all attractions
      * @return a list of all attractions with for each a name, a city, a state, a latitude and a longitude
      */
-    @RequestMapping("/attractions")
+    @GetMapping("/attractions")
     public List<Attraction> getAttractions() {
         return gpsUtilService.getAttractions();
     }

@@ -3,7 +3,6 @@ package gpsUtil.service;
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class GpsUtilServiceImpl implements GpsUtilService {
      * @param userId id of the user whose location is sought
      * @return a visited location composed of a userId, a location with longitude and latitude and a date
      */
-    @Autowired
+    @Override
     public VisitedLocation getUserLocation(UUID userId) {
         return gpsUtil.getUserLocation(userId);
     }
@@ -32,7 +31,7 @@ public class GpsUtilServiceImpl implements GpsUtilService {
      * Get a list of all attractions
      * @return a list of all attractions with for each a name, a city, a state, a latitude and a longitude
      */
-    @Autowired
+    @Override
     public List<Attraction> getAttractions() {
         return gpsUtil.getAttractions();
     }
