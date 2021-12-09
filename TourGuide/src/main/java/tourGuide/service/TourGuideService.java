@@ -1,5 +1,6 @@
 package tourGuide.service;
 
+import tourGuide.beans.LocationBean;
 import tourGuide.beans.VisitedLocationBean;
 import tourGuide.model.Dto.NearbyAttractionListByUserDto;
 import tourGuide.model.user.User;
@@ -7,6 +8,7 @@ import tourGuide.model.user.UserReward;
 import tripPricer.Provider;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public interface TourGuideService {
@@ -66,4 +68,11 @@ public interface TourGuideService {
      * @return the closest five tourist attractions to the user sorted in ascending order with all user and attractions information
      */
     NearbyAttractionListByUserDto nearbyAttractionListByUserDto(VisitedLocationBean visitedLocationBean);
+
+    /**
+     * Get a list of every user's most recent location
+     *
+     * @return a map with for each user key = userId and value = {latitude, longitude}
+     */
+    Map<String, LocationBean> getAllCurrentLocations();
 }
