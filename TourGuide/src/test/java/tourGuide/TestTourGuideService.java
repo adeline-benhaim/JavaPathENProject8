@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import tourGuide.beans.AttractionBean;
+import tourGuide.beans.LocationBean;
 import tourGuide.beans.VisitedLocationBean;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Dto.NearbyAttractionListByUserDto;
@@ -18,6 +19,7 @@ import tourGuide.service.TourGuideServiceImpl;
 import tripPricer.Provider;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -175,5 +177,27 @@ public class TestTourGuideService {
         assertEquals(5, providers.size());
 
 //		assertEquals(10, providers.size());
+    }
+
+    @Test
+    @DisplayName("Get all current locations")
+    public void getAllCurrentLocations() {
+
+        //GIVEN
+        User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+        User user2 = new User(UUID.randomUUID(), "jon2", "000", "jon2@tourGuide.com");
+        tourGuideService.addUser(user);
+        tourGuideService.addUser(user2);
+        tourGuideService.generateUserLocationHistory(user);
+        tourGuideService.generateUserLocationHistory(user2);
+
+        //WHEN
+        Map<String, LocationBean> allCurrentLocations = tourGuideService.getAllCurrentLocations();
+        tourGuideService.tracker.stopTracking();
+
+        //THEN
+        assertEquals(2, allCurrentLocations.size());
+        assertTrue(allCurrentLocations.containsKey(user.getUserId().toString()));
+        assertTrue(allCurrentLocations.containsValue(user.getLastVisitedLocation().locationBean));
     }
 }

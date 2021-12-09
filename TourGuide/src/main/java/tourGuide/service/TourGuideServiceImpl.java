@@ -214,6 +214,25 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .build();
     }
 
+    /**
+     * Get a list of every user's most recent location
+     *
+     * @return a map with for each user key = userId and value = {latitude, longitude}
+     */
+    @Override
+    public Map<String, LocationBean> getAllCurrentLocations() {
+        List<User> allUser = getAllUsers();
+        String id;
+        LocationBean location;
+        Map<String, LocationBean> allLocation = new HashMap<>();
+        for (User user : allUser) {
+            id = user.getUserId().toString();
+            location = user.getLastVisitedLocation().locationBean;
+            allLocation.put(id, location);
+        }
+        return allLocation;
+    }
+
     private void addShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(tracker::stopTracking));
     }
