@@ -45,7 +45,7 @@ public class RewardsService {
 <span class="fc bfc" id="L45" title="All 2 branches covered.">            for (VisitedLocationBean visitedLocation : userLocations) {</span>
 <span class="fc bfc" id="L46" title="All 2 branches covered.">                for (AttractionBean attraction : attractions) {</span>
 <span class="fc bfc" id="L47" title="All 2 branches covered.">                    if (user.getUserRewards().stream().noneMatch(r -&gt; r.attraction.attractionName.equals(attraction.attractionName))) {</span>
-<span class="fc bfc" id="L48" title="All 2 branches covered.">                        if (nearAttraction(visitedLocation, attraction)) {</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">                        if (nearAttraction(visitedLocation, attraction)) {</span>
 <span class="fc" id="L49">                            CompletableFuture.supplyAsync(() -&gt; getRewardPoints(attraction, user), executorService)</span>
 <span class="fc" id="L50">                                    .thenAccept(rewardPoints -&gt; {</span>
 <span class="fc" id="L51">                                        UserReward userReward = new UserReward(visitedLocation, attraction, rewardPoints);</span>
@@ -63,23 +63,24 @@ public class RewardsService {
     }
 
     private boolean nearAttraction(VisitedLocationBean visitedLocation, AttractionBean attraction) {
-<span class="fc bfc" id="L66" title="All 2 branches covered.">        return !(getDistance(attraction, visitedLocation.locationBean) &gt; proximityBuffer);</span>
+<span class="fc" id="L66">        return true;</span>
+//        return !(getDistance(attraction, visitedLocation.locationBean) &gt; proximityBuffer);
     }
 
     public int getRewardPoints(AttractionBean attraction, User user) {
-<span class="fc" id="L70">        return rewardsCentral.getRewards(attraction.attractionId, user.getUserId());</span>
+<span class="fc" id="L71">        return rewardsCentral.getRewards(attraction.attractionId, user.getUserId());</span>
     }
 
     public double getDistance(LocationBean loc1, LocationBean loc2) {
-<span class="fc" id="L74">        double lat1 = Math.toRadians(loc1.latitude);</span>
-<span class="fc" id="L75">        double lon1 = Math.toRadians(loc1.longitude);</span>
-<span class="fc" id="L76">        double lat2 = Math.toRadians(loc2.latitude);</span>
-<span class="fc" id="L77">        double lon2 = Math.toRadians(loc2.longitude);</span>
+<span class="fc" id="L75">        double lat1 = Math.toRadians(loc1.latitude);</span>
+<span class="fc" id="L76">        double lon1 = Math.toRadians(loc1.longitude);</span>
+<span class="fc" id="L77">        double lat2 = Math.toRadians(loc2.latitude);</span>
+<span class="fc" id="L78">        double lon2 = Math.toRadians(loc2.longitude);</span>
 
-<span class="fc" id="L79">        double angle = Math.acos(Math.sin(lat1) * Math.sin(lat2)</span>
-<span class="fc" id="L80">                + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));</span>
-<span class="fc" id="L81">        double nauticalMiles = 60 * Math.toDegrees(angle);</span>
-<span class="fc" id="L82">        return STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;</span>
+<span class="fc" id="L80">        double angle = Math.acos(Math.sin(lat1) * Math.sin(lat2)</span>
+<span class="fc" id="L81">                + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));</span>
+<span class="fc" id="L82">        double nauticalMiles = 60 * Math.toDegrees(angle);</span>
+<span class="fc" id="L83">        return STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;</span>
     }
 
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TripPricerServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TourGuide</a> &gt; <a href="index.source.html" class="el_package">tourGuide.service</a> &gt; <span class="el_source">TripPricerServiceImpl.java</span></div><h1>TripPricerServiceImpl.java</h1><pre class="source lang-java linenums">package tourGuide.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import tourGuide.exceptions.UserNotFoundException;
+import tourGuide.model.user.User;
+import tourGuide.model.user.UserPreferences;
+import tourGuide.model.user.UserReward;
+import tripPricer.Provider;
+import tripPricer.TripPricer;
+
+import java.util.List;
+
+import static tourGuide.service.TourGuideServiceImpl.tripPricerApiKey;
+
+@Service
+<span class="fc" id="L17">public class TripPricerServiceImpl implements TripPricerService {</span>
+
+    @Autowired
+    TourGuideService tourGuideService;
+
+<span class="fc" id="L22">    private final TripPricer tripPricer = new TripPricer();</span>
+
+    /**
+     * Get a list of provider with price offer by user.
+     * Each provider contains :
+     * - a name
+     * - a price
+     * - an id
+     *
+     * @param user the user whose providers are sought
+     * @return a list of providers with price offer
+     */
+    @Override
+    public List&lt;Provider&gt; getTripDeals(User user) {
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if (!tourGuideService.isExistingUser(user)) throw new UserNotFoundException(&quot;No user found with this username&quot;);</span>
+<span class="fc" id="L37">        int cumulativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();</span>
+<span class="fc" id="L38">        List&lt;Provider&gt; providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),</span>
+<span class="fc" id="L39">                user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulativeRewardPoints);</span>
+<span class="fc" id="L40">        user.setTripDeals(providers);</span>
+<span class="fc" id="L41">        return providers;</span>
+    }
+
+    /**
+     * Update user's preferences
+     *
+     * @param user the user whose preferences are to be updated
+     * @param userPreferences the preferences to update
+     * @return updated user preferences
+     */
+    @Override
+    public UserPreferences updateUserPreferences(User user, UserPreferences userPreferences) {
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if (!tourGuideService.isExistingUser(user)) throw new UserNotFoundException(&quot;No user found with this username&quot;);</span>
+<span class="fc" id="L54">        user.setUserPreferences(userPreferences);</span>
+<span class="fc" id="L55">        return user.getUserPreferences();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
