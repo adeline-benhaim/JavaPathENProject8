@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import tourGuide.beans.AttractionBean;
 import tourGuide.beans.LocationBean;
 import tourGuide.beans.VisitedLocationBean;
+import tourGuide.exceptions.UserNotFoundException;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Dto.NearbyAttractionDto;
 import tourGuide.model.Dto.NearbyAttractionListByUserDto;
@@ -13,8 +14,6 @@ import tourGuide.model.user.User;
 import tourGuide.model.user.UserReward;
 import tourGuide.proxies.GpsUtilProxy;
 import tourGuide.tracker.Tracker;
-import tripPricer.Provider;
-import tripPricer.TripPricer;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -30,9 +29,8 @@ public class TourGuideServiceImpl implements TourGuideService {
     private final Logger logger = LoggerFactory.getLogger(TourGuideServiceImpl.class);
     private final GpsUtilProxy gpsUtil;
     private final RewardsService rewardsService;
-    private final TripPricer tripPricer = new TripPricer();
     public final Tracker tracker;
-    boolean testMode = true;
+    public boolean testMode = true;
 
     public TourGuideServiceImpl(GpsUtilProxy gpsUtil, RewardsService rewardsService) {
         this.gpsUtil = gpsUtil;
@@ -60,6 +58,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      */
     @Override
     public List<UserReward> getUserRewards(User user) {
+        if (!isExistingUser(user)) throw new UserNotFoundException("No user found with this username");
         return user.getUserRewards();
     }
 
@@ -73,6 +72,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      */
     @Override
     public VisitedLocationBean getUserLocation(User user) throws ExecutionException, InterruptedException {
+        if (!isExistingUser(user)) throw new UserNotFoundException("No user found with this username");
         return (user.getVisitedLocations().size() > 0) ?
                 user.getLastVisitedLocation() :
                 trackUserLocation(user).get();
@@ -107,25 +107,6 @@ public class TourGuideServiceImpl implements TourGuideService {
         if (!internalUserMap.containsKey(user.getUserName())) {
             internalUserMap.put(user.getUserName(), user);
         }
-    }
-
-    /**
-     * Get a list of provider with price offer by user.
-     * Each provider contains :
-     * - a name
-     * - a price
-     * - an id
-     *
-     * @param user the user whose providers are sought
-     * @return a list of providers with price offer
-     */
-    @Override
-    public List<Provider> getTripDeals(User user) {
-        int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
-        List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
-                user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
-        user.setTripDeals(providers);
-        return providers;
     }
 
     /**
@@ -164,6 +145,20 @@ public class TourGuideServiceImpl implements TourGuideService {
             }
         }
         return userByID;
+    }
+
+    /**
+     * Check if user exist
+     *
+     * @param user to check
+     * @return  true if user exist
+     * @throws UserNotFoundException if user doesn't exist
+     */
+    @Override
+    public Boolean isExistingUser(User user) throws UserNotFoundException {
+        List<User> allUsers = getAllUsers();
+        if(!allUsers.contains(user)) throw new UserNotFoundException("No user found with this username");
+        return allUsers.contains(user);
     }
 
     /**
@@ -242,9 +237,9 @@ public class TourGuideServiceImpl implements TourGuideService {
      * Methods Below: For Internal Testing
      *
      **********************************************************************************/
-    private static final String tripPricerApiKey = "test-server-api-key";
+    public static final String tripPricerApiKey = "test-server-api-key";
     // Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
-    public final Map<String, User> internalUserMap = new HashMap<>();
+    public static Map<String, User> internalUserMap = new HashMap<>();
 
     private void initializeInternalUsers() {
         IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {

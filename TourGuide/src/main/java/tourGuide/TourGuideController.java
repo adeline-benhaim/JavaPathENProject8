@@ -2,12 +2,15 @@ package tourGuide;
 
 import com.jsoniter.output.JsonStream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import tourGuide.beans.VisitedLocationBean;
+import tourGuide.exceptions.UserNotFoundException;
 import tourGuide.model.user.User;
+import tourGuide.model.user.UserPreferences;
 import tourGuide.service.TourGuideService;
+import tourGuide.service.TripPricerService;
 import tripPricer.Provider;
 
 import java.util.List;
@@ -18,6 +21,8 @@ public class TourGuideController {
 
     @Autowired
     TourGuideService tourGuideService;
+    @Autowired
+    TripPricerService tripPricerService;
 
     @GetMapping("/")
     public String index() {
@@ -33,9 +38,13 @@ public class TourGuideController {
      * @throws InterruptedException can be thrown when a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted, either before or during the activity.
      */
     @GetMapping("/getLocation")
-    public String getLocation(@RequestParam String userName) throws ExecutionException, InterruptedException {
-        VisitedLocationBean visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-        return JsonStream.serialize(visitedLocation.locationBean);
+    public ResponseEntity<String> getLocation(@RequestParam String userName) throws ExecutionException, InterruptedException {
+        try {
+            VisitedLocationBean visitedLocation = tourGuideService.getUserLocation(tourGuideService.getUser(userName));
+            return ResponseEntity.ok(JsonStream.serialize(visitedLocation.locationBean));
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -52,9 +61,13 @@ public class TourGuideController {
      * @throws InterruptedException can be thrown when a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted, either before or during the activity.
      */
     @GetMapping("/getNearbyAttractions")
-    public String getNearbyAttractions(@RequestParam String userName) throws ExecutionException, InterruptedException {
-        VisitedLocationBean visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-        return JsonStream.serialize(tourGuideService.nearbyAttractionListByUserDto(visitedLocation));
+    public ResponseEntity<String> getNearbyAttractions(@RequestParam String userName) throws ExecutionException, InterruptedException {
+        try {
+            VisitedLocationBean visitedLocation = tourGuideService.getUserLocation(tourGuideService.getUser(userName));
+            return ResponseEntity.ok(JsonStream.serialize(tourGuideService.nearbyAttractionListByUserDto(visitedLocation)));
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -68,8 +81,12 @@ public class TourGuideController {
      * @return a list of user reward
      */
     @GetMapping("/getRewards")
-    public String getRewards(@RequestParam String userName) {
-        return JsonStream.serialize(tourGuideService.getUserRewards(getUser(userName)));
+    public ResponseEntity<String> getRewards(@RequestParam String userName) {
+        try {
+            return ResponseEntity.ok(JsonStream.serialize(tourGuideService.getUserRewards(tourGuideService.getUser(userName))));
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -93,9 +110,30 @@ public class TourGuideController {
      * @return a list of providers with price offer
      */
     @GetMapping("/getTripDeals")
-    public String getTripDeals(@RequestParam String userName) {
-        List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
-        return JsonStream.serialize(providers);
+    public ResponseEntity<String> getTripDeals(@RequestParam String userName) {
+        try {
+            List<Provider> providers = tripPricerService.getTripDeals(tourGuideService.getUser(userName));
+            return ResponseEntity.ok(JsonStream.serialize(providers));
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * Update user's preferences
+     *
+     * @param userName the username of user whose preferences are to be updated
+     * @param preferencesUpdated the preferences to update
+     * @return updated user preferences
+     */
+    @PutMapping("/updateUserPreferences")
+    public ResponseEntity<UserPreferences> updateUserPreferences(@RequestParam String userName, @RequestBody UserPreferences preferencesUpdated) {
+        try {
+            UserPreferences userPreferenceToUpdate = tripPricerService.updateUserPreferences(tourGuideService.getUser(userName), preferencesUpdated);
+            return ResponseEntity.ok(userPreferenceToUpdate);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -104,9 +142,8 @@ public class TourGuideController {
      * @param userName of user sought
      * @return the user found
      */
-    private User getUser(String userName) {
+    @GetMapping("/getUser")
+    private User getUser(@RequestParam String userName) {
         return tourGuideService.getUser(userName);
     }
-
-
 }

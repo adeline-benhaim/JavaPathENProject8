@@ -1,5 +1,6 @@
 package tourGuide.beans;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 public class VisitedLocationBean {
     public final UUID userId;
     public final LocationBean locationBean;
