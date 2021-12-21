@@ -1,5 +1,6 @@
 package tourGuide.service;
 
+import tourGuide.beans.AttractionBean;
 import tourGuide.beans.LocationBean;
 import tourGuide.beans.VisitedLocationBean;
 import tourGuide.exceptions.UserNotFoundException;
@@ -22,18 +23,6 @@ public interface TourGuideService {
      * @throws InterruptedException can be thrown when a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted, either before or during the activity.
      */
     VisitedLocationBean getUserLocation(User user) throws ExecutionException, InterruptedException;
-
-    /**
-     * Get a list of rewards per user.
-     * Each reward contain :
-     * - a visited location
-     * - an attraction
-     * - a reward point
-     *
-     * @param user the user whose rewards are sought
-     * @return a list of user reward
-     */
-    List<UserReward> getUserRewards(User user);
 
     /**
      * Get a user by userName
@@ -72,4 +61,12 @@ public interface TourGuideService {
      * @throws UserNotFoundException if user doesn't exist
      */
     Boolean isExistingUser(User user) throws UserNotFoundException;
+
+    /**
+     * Get an attraction by attraction name
+     *
+     * @param attractionName the name whose attraction is sought
+     * @return attraction found by name
+     */
+    AttractionBean getAttraction(String attractionName) throws Exception;
 }

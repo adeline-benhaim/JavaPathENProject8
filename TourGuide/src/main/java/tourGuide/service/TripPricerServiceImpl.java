@@ -1,7 +1,10 @@
 package tourGuide.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tourGuide.beans.AttractionBean;
 import tourGuide.exceptions.UserNotFoundException;
 import tourGuide.model.user.User;
 import tourGuide.model.user.UserPreferences;
@@ -15,9 +18,7 @@ import static tourGuide.service.TourGuideServiceImpl.tripPricerApiKey;
 
 @Service
 public class TripPricerServiceImpl implements TripPricerService {
-
-    @Autowired
-    TourGuideService tourGuideService;
+    private final Logger logger = LoggerFactory.getLogger(TripPricerServiceImpl.class);
 
     private final TripPricer tripPricer = new TripPricer();
 
@@ -29,11 +30,12 @@ public class TripPricerServiceImpl implements TripPricerService {
      * - an id
      *
      * @param user the user whose providers are sought
+     * @param attractionBean the attraction whose deals are sought
      * @return a list of providers with price offer
      */
     @Override
-    public List<Provider> getTripDeals(User user) {
-        if (!tourGuideService.isExistingUser(user)) throw new UserNotFoundException("No user found with this username");
+    public List<Provider> getTripDeals(User user, AttractionBean attractionBean) {
+        logger.info("Get trip deal");
         int cumulativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
         List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
                 user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulativeRewardPoints);
@@ -50,7 +52,7 @@ public class TripPricerServiceImpl implements TripPricerService {
      */
     @Override
     public UserPreferences updateUserPreferences(User user, UserPreferences userPreferences) {
-        if (!tourGuideService.isExistingUser(user)) throw new UserNotFoundException("No user found with this username");
+        logger.info("Update user preferences");
         user.setUserPreferences(userPreferences);
         return user.getUserPreferences();
     }

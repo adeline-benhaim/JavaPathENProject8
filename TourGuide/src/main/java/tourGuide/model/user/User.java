@@ -29,44 +29,8 @@ public class User {
 		this.emailAddress = emailAddress;
 	}
 	
-	public UUID getUserId() {
-		return userId;
-	}
-	
-	public String getUserName() {
-		return userName;
-	}
-	
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-	
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-
-	public void setEmailAddress(String emailAddress) {
-		this.emailAddress = emailAddress;
-	}
-	
-	public String getEmailAddress() {
-		return emailAddress;
-	}
-	
-	public void setLatestLocationTimestamp(Date latestLocationTimestamp) {
-		this.latestLocationTimestamp = latestLocationTimestamp;
-	}
-	
-	public Date getLatestLocationTimestamp() {
-		return latestLocationTimestamp;
-	}
-	
 	public void addToVisitedLocations(VisitedLocationBean visitedLocation) {
 		visitedLocations.add(visitedLocation);
-	}
-	
-	public List<VisitedLocationBean> getVisitedLocations() {
-		return visitedLocations;
 	}
 	
 	public void clearVisitedLocations() {
@@ -74,33 +38,14 @@ public class User {
 	}
 	
 	public void addUserReward(UserReward userReward) {
-		if(userRewards.stream().noneMatch(r -> true)) {
+		if (userRewards.stream().filter(r -> r.attraction.attractionName.equals(userReward
+				.attraction.attractionName)).count() == 0) {
 			userRewards.add(userReward);
 		}
-	}
-	
-	public List<UserReward> getUserRewards() {
-		return userRewards;
-	}
-	
-	public UserPreferences getUserPreferences() {
-		return userPreferences;
-	}
-	
-	public void setUserPreferences(UserPreferences userPreferences) {
-		this.userPreferences = userPreferences;
 	}
 
 	public VisitedLocationBean getLastVisitedLocation() {
 		return visitedLocations.get(visitedLocations.size() - 1);
-	}
-	
-	public void setTripDeals(List<Provider> tripDeals) {
-		this.tripDeals = tripDeals;
-	}
-	
-	public List<Provider> getTripDeals() {
-		return tripDeals;
 	}
 
 }
