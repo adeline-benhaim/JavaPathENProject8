@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import tourGuide.beans.AttractionBean;
 import tourGuide.beans.LocationBean;
 import tourGuide.beans.VisitedLocationBean;
+import tourGuide.exceptions.AttractionNotFoundException;
 import tourGuide.exceptions.UserNotFoundException;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Dto.NearbyAttractionDto;
@@ -28,13 +29,13 @@ import java.util.stream.IntStream;
 public class TourGuideServiceImpl implements TourGuideService {
     private final Logger logger = LoggerFactory.getLogger(TourGuideServiceImpl.class);
     private final GpsUtilProxy gpsUtil;
-    private final RewardsService rewardsService;
+    private final RewardsServiceImpl rewardsServiceImpl;
     public final Tracker tracker;
     public boolean testMode = true;
 
-    public TourGuideServiceImpl(GpsUtilProxy gpsUtil, RewardsService rewardsService) {
+    public TourGuideServiceImpl(GpsUtilProxy gpsUtil, RewardsServiceImpl rewardsServiceImpl) {
         this.gpsUtil = gpsUtil;
-        this.rewardsService = rewardsService;
+        this.rewardsServiceImpl = rewardsServiceImpl;
 
         if (testMode) {
             logger.info("TestMode enabled");
@@ -47,22 +48,6 @@ public class TourGuideServiceImpl implements TourGuideService {
     }
 
     /**
-     * Get a list of rewards per user.
-     * Each reward contain :
-     * - a visited location
-     * - an attraction
-     * - a reward point
-     *
-     * @param user the user whose rewards are sought
-     * @return a list of user reward
-     */
-    @Override
-    public List<UserReward> getUserRewards(User user) {
-        if (!isExistingUser(user)) throw new UserNotFoundException("No user found with this username");
-        return user.getUserRewards();
-    }
-
-    /**
      * Get a visitedLocation by user
      *
      * @param user the user whose location is sought
@@ -72,6 +57,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      */
     @Override
     public VisitedLocationBean getUserLocation(User user) throws ExecutionException, InterruptedException {
+        logger.info("Get location for user : {}", user.getUserName());
         if (!isExistingUser(user)) throw new UserNotFoundException("No user found with this username");
         return (user.getVisitedLocations().size() > 0) ?
                 user.getLastVisitedLocation() :
@@ -86,6 +72,8 @@ public class TourGuideServiceImpl implements TourGuideService {
      */
     @Override
     public User getUser(String userName) {
+        logger.info("Get user by user name : {}", userName);
+        if (!internalUserMap.containsKey(userName)) throw new UserNotFoundException("No user found with this username");
         return internalUserMap.get(userName);
     }
 
@@ -95,6 +83,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      * @return a list with all users found
      */
     public List<User> getAllUsers() {
+        logger.info("Get all users");
         return new ArrayList<>(internalUserMap.values());
     }
 
@@ -104,6 +93,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      * @param user to save
      */
     public void addUser(User user) {
+        logger.info("Add user : {}", user.getUserName());
         if (!internalUserMap.containsKey(user.getUserName())) {
             internalUserMap.put(user.getUserName(), user);
         }
@@ -116,18 +106,14 @@ public class TourGuideServiceImpl implements TourGuideService {
      * @return a completableFuture of visitedLocation
      */
     public CompletableFuture<VisitedLocationBean> trackUserLocation(User user) {
+        logger.info("Track location for user name : {}", user.getUserName());
         ExecutorService executorService = Executors.newFixedThreadPool(1000);
         return CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId()), executorService)
                 .thenApply(visitedLocationBean -> {
                     user.addToVisitedLocations(visitedLocationBean);
-                    rewardsService.calculateRewards(user);
+                    rewardsServiceImpl.calculateRewards(user);
                     return visitedLocationBean;
                 });
-
-//        CompletableFuture<VisitedLocationBean> visitedLocation = CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId()),executorService);
-//        CompletableFuture<Void> future = visitedLocation.thenAccept(user::addToVisitedLocations);
-//        rewardsService.calculateRewards(user);
-//        return visitedLocation;
     }
 
     /**
@@ -137,6 +123,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      * @return user found
      */
     public User getUserById(UUID userId) {
+        logger.info("Get user by id : {}", userId);
         List<User> userList = getAllUsers();
         User userByID = null;
         for (User user : userList) {
@@ -156,6 +143,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      */
     @Override
     public Boolean isExistingUser(User user) throws UserNotFoundException {
+        logger.info("Check if existing user : {}", user.getUserName());
         List<User> allUsers = getAllUsers();
         if(!allUsers.contains(user)) throw new UserNotFoundException("No user found with this username");
         return allUsers.contains(user);
@@ -168,10 +156,11 @@ public class TourGuideServiceImpl implements TourGuideService {
      * @return a list with the closest five tourist attractions to the user sorted in ascending order
      */
     public List<AttractionBean> getNearByAttractions(VisitedLocationBean visitedLocation) {
+        logger.info("Get near attractions for visited location : latitude {}, longitude {}", visitedLocation.getLocationBean().getLatitude(), visitedLocation.getLocationBean().getLongitude());
         List<AttractionBean> nearbyAttractions = new ArrayList<>();
         List<AttractionBean> attractionBeanList = gpsUtil.getAttractions();
         attractionBeanList.stream()
-                .sorted(Comparator.comparingDouble(attractionBean -> rewardsService.getDistance(new LocationBean(attractionBean.getLatitude(), attractionBean.getLatitude()), visitedLocation.locationBean)))
+                .sorted(Comparator.comparingDouble(attractionBean -> rewardsServiceImpl.getDistance(new LocationBean(attractionBean.getLatitude(), attractionBean.getLatitude()), visitedLocation.locationBean)))
                 .limit(5)
                 .forEach(nearbyAttractions::add);
         return nearbyAttractions;
@@ -190,6 +179,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      */
     @Override
     public NearbyAttractionListByUserDto nearbyAttractionListByUserDto(VisitedLocationBean visitedLocationBean) {
+        logger.info("Get near attractions with detail for visited location : latitude {}, longitude {}", visitedLocationBean.getLocationBean().getLatitude(), visitedLocationBean.getLocationBean().getLongitude());
         List<AttractionBean> nearbyAttractions = getNearByAttractions(visitedLocationBean);
         List<NearbyAttractionDto> nearbyAttractionDtos = new ArrayList<>();
         User user = getUserById(visitedLocationBean.userId);
@@ -198,8 +188,8 @@ public class TourGuideServiceImpl implements TourGuideService {
             nearbyAttractionDto = NearbyAttractionDto.builder()
                     .attractionNameDto(attractionBean.getAttractionName())
                     .attractionLocation("Latitude : " + attractionBean.getLatitude() + ", Longitude : " + attractionBean.longitude)
-                    .distanceDto(rewardsService.getDistance(new LocationBean(attractionBean.getLatitude(), attractionBean.getLatitude()), visitedLocationBean.locationBean))
-                    .rewardPoints(rewardsService.getRewardPoints(attractionBean, user))
+                    .distanceDto(rewardsServiceImpl.getDistance(new LocationBean(attractionBean.getLatitude(), attractionBean.getLatitude()), visitedLocationBean.locationBean))
+                    .rewardPoints(rewardsServiceImpl.getRewardPoints(attractionBean, user))
                     .build();
             nearbyAttractionDtos.add(nearbyAttractionDto);
         }
@@ -216,6 +206,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      */
     @Override
     public Map<String, LocationBean> getAllCurrentLocations() {
+        logger.info("Get all current location");
         List<User> allUser = getAllUsers();
         String id;
         LocationBean location;
@@ -226,6 +217,29 @@ public class TourGuideServiceImpl implements TourGuideService {
             allLocation.put(id, location);
         }
         return allLocation;
+    }
+
+    /**
+     * Get an attraction by attraction name
+     *
+     * @param attractionName the name whose attraction is sought
+     * @return attraction found by name
+     */
+    @Override
+    public AttractionBean getAttraction(String attractionName) {
+        logger.info("Get attraction by name : {}", attractionName);
+        List<AttractionBean> attractionBeanList = gpsUtil.getAttractions();
+        AttractionBean attraction = null;
+        for (AttractionBean attractionBean : attractionBeanList) {
+            if (attractionBean.getAttractionName().equalsIgnoreCase(attractionName)) {
+                attraction = attractionBean;
+                break;
+            } else {
+                logger.error("Attraction " + attractionName + " doesn't exist");
+                throw new AttractionNotFoundException("Attraction : " + attractionName + " not found");
+            }
+        }
+        return attraction;
     }
 
     private void addShutDownHook() {
@@ -251,6 +265,9 @@ public class TourGuideServiceImpl implements TourGuideService {
 
             internalUserMap.put(userName, user);
         });
+        User userCustom = new User(UUID.randomUUID(), "userCustom", "000", "userCustom@tourGuide.com");
+        userCustom.addToVisitedLocations(new VisitedLocationBean(userCustom.getUserId(), new LocationBean(33.817595D, -117.922008D), getRandomTime()));
+        internalUserMap.put("userCustom", userCustom);
         logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
     }
 

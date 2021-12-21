@@ -13,9 +13,4 @@ public class NearbyAttractionListByUserDto {
 
     private String userLocation;
     private List<NearbyAttractionDto> nearbyAttractionsDto;
-
-    public NearbyAttractionListByUserDto(String locationBean, List<NearbyAttractionDto> nearbyAttractions) {
-        this.userLocation = locationBean;
-        this.nearbyAttractionsDto = nearbyAttractions;
-    }
 }

@@ -12,8 +12,7 @@ import tourGuide.beans.VisitedLocationBean;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.user.User;
 import tourGuide.proxies.GpsUtilProxy;
-import tourGuide.service.RewardsService;
-import tourGuide.service.TourGuideService;
+import tourGuide.service.RewardsServiceImpl;
 import tourGuide.service.TourGuideServiceImpl;
 
 import java.util.Date;
@@ -50,7 +49,7 @@ public class TestPerformance {
     @Autowired
     GpsUtilProxy gpsUtilProxy;
     @Autowired
-    RewardsService rewardsService;
+    RewardsServiceImpl rewardsServiceImpl;
     @Autowired
     TourGuideServiceImpl tourGuideService;
 
@@ -65,7 +64,7 @@ public class TestPerformance {
     @Test
     public void highVolumeTrackLocation() {
         // Users should be incremented up to 100,000, and test finishes within 15 minutes
-        tourGuideService = new TourGuideServiceImpl(gpsUtilProxy, rewardsService);
+        tourGuideService = new TourGuideServiceImpl(gpsUtilProxy, rewardsServiceImpl);
 
         List<User> allUsers = tourGuideService.getAllUsers();
         StopWatch stopWatch = new StopWatch();
@@ -86,13 +85,13 @@ public class TestPerformance {
         // Users should be incremented up to 100,000, and test finishes within 20 minutes
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        tourGuideService = new TourGuideServiceImpl(gpsUtilProxy, rewardsService);
+        tourGuideService = new TourGuideServiceImpl(gpsUtilProxy, rewardsServiceImpl);
         AttractionBean attraction = gpsUtilProxy.getAttractions().get(0);
         List<User> allUsers = tourGuideService.getAllUsers();
         allUsers.forEach(u -> {
             u.clearVisitedLocations();
             u.addToVisitedLocations(new VisitedLocationBean(u.getUserId(), attraction, new Date()));
-            rewardsService.calculateRewards(u);
+            rewardsServiceImpl.calculateRewards(u);
         });
 
         for (User user : allUsers) {

@@ -1,5 +1,6 @@
 package tourGuide.service;
 
+import tourGuide.beans.AttractionBean;
 import tourGuide.model.user.User;
 import tourGuide.model.user.UserPreferences;
 import tripPricer.Provider;
@@ -16,9 +17,10 @@ public interface TripPricerService {
      * - an id
      *
      * @param user the user whose providers are sought
+     * @param attractionBean the attraction whose deals are sought
      * @return a list of providers with price offer
      */
-    List<Provider> getTripDeals(User user);
+    List<Provider> getTripDeals(User user, AttractionBean attractionBean);
 
     /**
      * Update user's preferences

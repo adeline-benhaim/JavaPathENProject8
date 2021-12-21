@@ -7,11 +7,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import tourGuide.beans.AttractionBean;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.user.User;
 import tourGuide.model.user.UserPreferences;
 import tourGuide.proxies.GpsUtilProxy;
-import tourGuide.service.RewardsService;
+import tourGuide.service.RewardsServiceImpl;
 import tourGuide.service.TourGuideServiceImpl;
 import tourGuide.service.TripPricerService;
 import tripPricer.Provider;
@@ -28,7 +29,7 @@ public class TestTripPricerService {
     @Autowired
     GpsUtilProxy gpsUtilProxy;
     @Autowired
-    RewardsService rewardsService;
+    RewardsServiceImpl rewardsServiceImpl;
     @Autowired
     TourGuideServiceImpl tourGuideService;
     @Autowired
@@ -37,7 +38,7 @@ public class TestTripPricerService {
     @Before
     public void init() {
         InternalTestHelper.setInternalUserNumber(0);
-        tourGuideService = new TourGuideServiceImpl(gpsUtilProxy, rewardsService);
+        tourGuideService = new TourGuideServiceImpl(gpsUtilProxy, rewardsServiceImpl);
     }
 
     @Test
@@ -46,10 +47,11 @@ public class TestTripPricerService {
 
         //GIVEN
         User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+        AttractionBean attractionBean = new AttractionBean("Disneyland", "Anaheim", "CA", 33.817595D, -117.922008D);
         TourGuideServiceImpl.internalUserMap.put("jon",user);
 
         //WHEN
-        List<Provider> providers = tripPricerService.getTripDeals(user);
+        List<Provider> providers = tripPricerService.getTripDeals(user, attractionBean);
         tourGuideService.tracker.stopTracking();
 
         //THEN
