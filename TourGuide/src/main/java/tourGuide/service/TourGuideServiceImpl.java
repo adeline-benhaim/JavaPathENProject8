@@ -12,7 +12,6 @@ import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Dto.NearbyAttractionDto;
 import tourGuide.model.Dto.NearbyAttractionListByUserDto;
 import tourGuide.model.user.User;
-import tourGuide.model.user.UserReward;
 import tourGuide.proxies.GpsUtilProxy;
 import tourGuide.tracker.Tracker;
 
@@ -138,14 +137,14 @@ public class TourGuideServiceImpl implements TourGuideService {
      * Check if user exist
      *
      * @param user to check
-     * @return  true if user exist
+     * @return true if user exist
      * @throws UserNotFoundException if user doesn't exist
      */
     @Override
     public Boolean isExistingUser(User user) throws UserNotFoundException {
         logger.info("Check if existing user : {}", user.getUserName());
         List<User> allUsers = getAllUsers();
-        if(!allUsers.contains(user)) throw new UserNotFoundException("No user found with this username");
+        if (!allUsers.contains(user)) throw new UserNotFoundException("No user found with this username");
         return allUsers.contains(user);
     }
 
@@ -253,7 +252,7 @@ public class TourGuideServiceImpl implements TourGuideService {
      **********************************************************************************/
     public static final String tripPricerApiKey = "test-server-api-key";
     // Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
-    public static Map<String, User> internalUserMap = new HashMap<>();
+    public Map<String, User> internalUserMap = new HashMap<>();
 
     private void initializeInternalUsers() {
         IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {
