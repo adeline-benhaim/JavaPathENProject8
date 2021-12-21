@@ -1,0 +1,32 @@
+version: "3"
+services:
+
+  tourGuide:
+    depends_on:
+      - gpsUtil
+      - rewardCentral
+    image: tour_guide:1.0
+    build:
+      context: TourGuide
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      GPS_UTIL_PROXY_URL: http://gpsUtil:8002
+      REWARD_CENTRAL_PROXY_URL: http://rewardCentral:8001
+
+  gpsUtil:
+    image: gps_util:1.0
+    build:
+      context: GpsUtil
+    ports:
+      - "8002:8002"
+    restart: always
+
+  rewardCentral:
+    image: reward_central:1.0
+    build:
+      context: RewardCentral
+    ports:
+      - "8001:8001"
+    restart: always
