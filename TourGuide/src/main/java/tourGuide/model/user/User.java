@@ -30,6 +30,7 @@ public class User {
 	}
 	
 	public void addToVisitedLocations(VisitedLocationBean visitedLocation) {
+		setLatestLocationTimestamp(visitedLocation.getTimeVisited());
 		visitedLocations.add(visitedLocation);
 	}
 	
